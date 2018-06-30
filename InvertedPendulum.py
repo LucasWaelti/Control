@@ -12,7 +12,7 @@ class Physics():
         self.m = 0.1  # kg
         self.l = 0.1  # m
         self.g = 9.81 # m/s^2
-        self.phi = -0.3  # rad (small offset to get out of equilibrium)
+        self.phi = -0.2  # rad (small offset to get out of equilibrium)
         self.phi_dot = 0    # rad/s
         self.phi_ddot = 0   # rad/s^2
         self.fallen = False # Has the pendulum fallen?
@@ -36,10 +36,10 @@ class Physics():
         self.phi +=  self.phi_dot * self.t
         #return # Uncomment to let the pendulum swing
         if(self.phi >= math.pi/2):
-            self.phi= math.pi/2
+            #self.phi= math.pi/2
             self.fallen = True
         elif(self.phi <= -math.pi/2):
-            self.phi = -math.pi/2
+            #self.phi = -math.pi/2
             self.fallen = True
 
     def update_speed(self):
@@ -48,6 +48,13 @@ class Physics():
         self.p += self.v * self.t
         if(math.fabs(self.p) > width/2/1000):
             self.out_of_range = True
+
+    def update_physics(self):
+        self.calculate_phi_ddot()
+        self.update_phi_dot()
+        self.update_phi()
+        self.update_speed()
+        self.update_position()
             
     def generate_mass_coord(self):
         x = self.p - self.l * math.sin(self.phi)
@@ -181,6 +188,26 @@ def update_display(sim,stick,ball,support):
     canvas.coords(support,sup_pos[0]-30,sup_pos[1]+10,sup_pos[0]+30,sup_pos[1]-10)
     tk.update()
 
+def control_end_of_process(sim,pid,stick,ball,support,timer):
+    if(sim.out_of_range or sim.fallen or timer >= 100):# and math.fabs(sim.p) < 0.01):
+            if(sim.fallen):
+                # Let the pendulum swing down for animation
+                sim.acc = 0
+                sim.v = 0
+                for _ in range(300):
+                    # Add friction
+                    sim.M = -0.0008*sim.phi_dot
+                    sim.update_physics()
+                    update_display(sim,stick,ball,support)
+                    time.sleep(sim.t)
+            sim.reset()
+            pid.reset()
+            update_display(sim,stick,ball,support)
+            time.sleep(1)
+            return 0
+    if(math.fabs(sim.phi) < 0.01):
+            timer += 1
+    return timer
 
 def main():
     global tk,canvas
@@ -197,12 +224,8 @@ def main():
 
     # Initialize the controller for the pendulum
     pid = PIDcontroller()
-    pid.set_PID(p=50,i=1000,d=10)
+    pid.set_PID(p=200,i=4000,d=15) # 50, 1000, 10
     pid.set_max_acceleration(acc=20)
-    # Initialize the controller for the support
-    p_sup = PIDcontroller()
-    p_sup.set_PID(p=10,i=0,d=0)
-    p_sup.set_max_acceleration(acc=4)
 
     #Build the inverted pendulum
     update_display(sim,stick,ball,support)
@@ -213,32 +236,15 @@ def main():
     while(True):
         # Calculate control commands
         sim.acc = pid.control(value=sim.phi,t=sim.t)
-        if(timer % 2 == 0 and 0):
-            sim.acc += p_sup.control(value=sim.p,t=sim.t)
 
         # Update the physics
-        sim.calculate_phi_ddot()
-        sim.update_phi_dot()
-        sim.update_phi()
-        sim.update_speed()
-        sim.update_position()
+        sim.update_physics()
 
         update_display(sim,stick,ball,support)
         
         time.sleep(sim.t*1)
 
-        if(sim.out_of_range or sim.fallen or timer >= 100):# and math.fabs(sim.p) < 0.01):
-            if(sim.fallen):
-                time.sleep(1)
-            sim.reset()
-            pid.reset()
-            p_sup.reset()
-            update_display(sim,stick,ball,support)
-            timer = 0
-            time.sleep(1)
-
-        if(math.fabs(sim.phi) < 0.01):
-            timer += 1
+        timer = control_end_of_process(sim,pid,stick,ball,support,timer)
 
     tk.mainloop()
 
