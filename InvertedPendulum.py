@@ -7,7 +7,8 @@ global tk,canvas
 global width,height
 
 class Physics():
-    ''' This class provides the physics for the simulation'''
+    ''' This class provides the physics for the simulation
+        of a single inverted pendulum'''
     def __init__(self):
         self.m = 0.1  # kg
         self.l = 0.1  # m
@@ -96,7 +97,7 @@ class PIDcontroller():
         self.i = 0 # Integral value
         self.D = 0
         self.action = 0
-        self.acc_max = 0
+        self.val_max = 0
         return
 
     def set_PID(self,p=50,i=1,d=1.9):
@@ -105,8 +106,8 @@ class PIDcontroller():
         self.D = d
     def set_target(self, target=0):
         self.target = target
-    def set_max_acceleration(self,acc=4):
-        self.acc_max = acc
+    def set_max_control_value(self,max_val=4):
+        self.val_max = max_val
 
     def control(self,value,t):
         self.error = self.target - value 
@@ -117,10 +118,10 @@ class PIDcontroller():
         self.action = p + d + self.i * self.I
         self.pre_error = self.error
 
-        if(self.action > self.acc_max):
-            self.action = self.acc_max
-        elif(self.action < -self.acc_max):
-            self.action = -self.acc_max
+        if(self.action > self.val_max):
+            self.action = self.val_max
+        elif(self.action < -self.val_max):
+            self.action = -self.val_max
 
         return self.action
 
@@ -144,6 +145,7 @@ def mp(m):
 def setup_window():
     global tk,canvas,width,height
     tk = tkinter.Tk()
+    tk.title("Inverted Pendulum Simulation")
     width = 1500#500
     height = 400
     canvas = tkinter.Canvas(tk,width=width,height=height)
@@ -224,8 +226,9 @@ def main():
 
     # Initialize the controller for the pendulum
     pid = PIDcontroller()
-    pid.set_PID(p=200,i=4000,d=15) # 50, 1000, 10
-    pid.set_max_acceleration(acc=20)
+    pid.set_PID(p=200,i=4000,d=15) # p=50,i=1000,d=10
+    pid.set_target(target=0)
+    pid.set_max_control_value(max_val=20)
 
     #Build the inverted pendulum
     update_display(sim,stick,ball,support)
@@ -234,12 +237,11 @@ def main():
 
     # Run the simulation
     while(True):
-        # Calculate control commands
+        # Compute control commands
         sim.acc = pid.control(value=sim.phi,t=sim.t)
-
-        # Update the physics
+        # Update physics
         sim.update_physics()
-
+        # Update graphics
         update_display(sim,stick,ball,support)
         
         time.sleep(sim.t*1)
