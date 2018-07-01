@@ -18,6 +18,8 @@ class Physics():
         self.phi_ddot = 0   # rad/s^2
         self.fallen = False # Has the pendulum fallen?
         self.out_of_range = False # Has the support gone too far?
+        self.friction = True
+        self.mu = 0.0008 # Friction coefficient
 
         self.acc = 0  # m/s^2 (acceleration of the support)
         self.v = 0    # m/s (speed of support)
@@ -26,7 +28,9 @@ class Physics():
 
         self.t = 0.01 # sec (sampling time)
         return
-    
+
+    def calculate_friction(self):
+        self.M = -self.mu * self.phi_dot
     def calculate_phi_ddot(self):
         self.phi_ddot = self.g/self.l * math.sin(self.phi)
         self.phi_ddot += 1/self.l * math.cos(self.phi) * self.acc
@@ -51,6 +55,8 @@ class Physics():
             self.out_of_range = True
 
     def update_physics(self):
+        if(self.friction is True):
+            self.calculate_friction()
         self.calculate_phi_ddot()
         self.update_phi_dot()
         self.update_phi()
@@ -97,7 +103,7 @@ class PIDcontroller():
         self.i = 0 # Integral value
         self.D = 0
         self.action = 0
-        self.val_max = 0
+        self.max_val = 0
         return
 
     def set_PID(self,p=50,i=1,d=1.9):
@@ -107,7 +113,7 @@ class PIDcontroller():
     def set_target(self, target=0):
         self.target = target
     def set_max_control_value(self,max_val=4):
-        self.val_max = max_val
+        self.max_val = max_val
 
     def control(self,value,t):
         self.error = self.target - value 
@@ -118,10 +124,10 @@ class PIDcontroller():
         self.action = p + d + self.i * self.I
         self.pre_error = self.error
 
-        if(self.action > self.val_max):
-            self.action = self.val_max
-        elif(self.action < -self.val_max):
-            self.action = -self.val_max
+        if(self.action > self.max_val):
+            self.action = self.max_val
+        elif(self.action < -self.max_val):
+            self.action = -self.max_val
 
         return self.action
 
@@ -191,23 +197,37 @@ def update_display(sim,stick,ball,support):
     tk.update()
 
 def control_end_of_process(sim,pid,stick,ball,support,timer):
-    if(sim.out_of_range or sim.fallen or timer >= 100):# and math.fabs(sim.p) < 0.01):
+    if(sim.out_of_range or sim.fallen or timer >= 100):
             if(sim.fallen):
-                # Let the pendulum swing down for animation
-                sim.acc = 0
-                sim.v = 0
-                for _ in range(300):
-                    # Add friction
-                    sim.M = -0.0008*sim.phi_dot
+                # Condition for stability
+                limit = pid.max_val * sim.t / 2
+                # Stop the cart
+                while(math.fabs(sim.v) > limit):
+                    if(sim.out_of_range):
+                        break
+                    if(sim.v > 0):
+                        sim.acc = -pid.max_val
+                    else:
+                        sim.acc = pid.max_val
                     sim.update_physics()
                     update_display(sim,stick,ball,support)
                     time.sleep(sim.t)
+                sim.acc = 0
+                sim.v = 0
+                # Let the pendulum swing down for animation
+                for _ in range(300):
+                    if(sim.out_of_range):
+                        break
+                    sim.update_physics()
+                    update_display(sim,stick,ball,support)
+                    time.sleep(sim.t)
+            # Reset everything
             sim.reset()
             pid.reset()
             update_display(sim,stick,ball,support)
             time.sleep(1)
             return 0
-    if(math.fabs(sim.phi) < 0.01):
+    elif(math.fabs(sim.phi) < 0.01):
             timer += 1
     return timer
 
