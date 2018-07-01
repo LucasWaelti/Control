@@ -5,6 +5,7 @@ import random
 
 global tk,canvas
 global width,height
+global reset_phi
 
 class Physics():
     ''' 
@@ -71,15 +72,8 @@ class Physics():
         return x,y
 
     def reset(self):
-        random.seed()
-        r = random.getrandbits(8)/255
-        s = random.getrandbits(1) - 0.5
-        if(s >= 0):
-            s = 1
-        else:
-            s = -1
-        r *= s
-        self.phi = r  # rad (small offset to get out of equilibrium)
+        global reset_phi
+        self.phi = reset_phi  # rad (small offset to get out of equilibrium)
         self.phi_dot = 0    # rad/s
         self.phi_ddot = 0   # rad/s^2
         self.fallen = False # Has the pendulum fallen?
@@ -257,8 +251,21 @@ def setup_window():
     rail = canvas.create_line(0,height/2,width,height/2,width=2,fill="black")
     zero = canvas.create_line(width/2,height/2-5,width/2,height/2+5,width=2,fill="black")
 
+def generate_random_start():
+    global reset_phi
+    reset_phi = random.getrandbits(8)/255
+    s = random.getrandbits(1) - 0.5
+    if(s >= 0):
+        s = 1
+    else:
+        s = -1
+    reset_phi *= s
+
 def run(*p):
+    global reset_phi
+
     n = len(p)
+    random.seed()
     while(True):
         # Update all pendulums
         for i in range(0,n):
@@ -272,8 +279,10 @@ def run(*p):
             if(not done):
                 break
         if(done):
+            generate_random_start()
             for i in range(0,n):
                 p[i].reset()
+            
             time.sleep(1)
 
 def main():
@@ -286,7 +295,7 @@ def main():
     p1 = Pendulum(PIDcontroller)            # 1: Use default settings
     p2 = Pendulum(PIDcontroller,"blue")     # 2: Tune settings
     p2.controller.set_PID(p=10,i=100,d=1)
-    p3 = Pendulum(PIDcontroller,"red")      # 2: Tune settings
+    p3 = Pendulum(PIDcontroller,"red")      # 3: Tune settings
     p3.controller.set_PID(p=50,i=500,d=1)
 
     # Run the simulation
