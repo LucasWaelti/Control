@@ -282,7 +282,6 @@ def run(*p):
             generate_random_start()
             for i in range(0,n):
                 p[i].reset()
-            
             time.sleep(1)
 
 def main():
@@ -292,11 +291,11 @@ def main():
     setup_window()
     
     # Create pendulums
-    p1 = Pendulum(PIDcontroller)            # 1: Use default settings
-    p2 = Pendulum(PIDcontroller,"blue")     # 2: Tune settings
-    p2.controller.set_PID(p=10,i=100,d=1)
-    p3 = Pendulum(PIDcontroller,"red")      # 3: Tune settings
-    p3.controller.set_PID(p=50,i=500,d=1)
+    p1 = Pendulum(PIDcontroller)            # 1: Use default settings p=200,i=4000,d=15
+    p2 = Pendulum(PIDcontroller,"blue")      
+    p2.controller.set_PID(p=39.91,i=1010,d=10.2) # 2: N(s) = (s+1+10i)(s+1-10i)(s+100)
+    p3 = Pendulum(PIDcontroller,"red")        
+    p3.controller.set_PID(p=1009.81,i=0,d=20) # 3: N(s) = s(s+100)^2
 
     # Run the simulation
     run(p1,p2,p3)
