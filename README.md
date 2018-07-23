@@ -5,7 +5,7 @@ This repository is about Control Theory and aims at making experimentation simpl
 The file [MultipleInvertedPendulum.py](https://github.com/LucasWaelti/Control/blob/master/MultipleInvertedPendulum.py) contains the simulation of three pendulums with identical physical characteristics but with different controllers. 
 
 - Orange: a PID controls the acceleration of the cart. The closed loop has 3 poles located in -100, -10 and -10. The controller is very stable and relatively efficient. 
-- Green: the same controller is used than in the first case but is controlled by a second PID controller that set a target angle to direct the cart towards a target postion (center of the window). The approach is naive and pretty ustable. 
+- Green: the same controller is used than in the first case but is controlled by a second PID controller that set a target angle to direct the cart towards a target postion (center of the window). The approach is naive and pretty unstable. 
 - Blue: this is the best controller. It is actually a Linear Quadratic Controller (LQ) controlling the pendulum angle and cart positon in an optimal way. 
 
 ## Import the module "control"
