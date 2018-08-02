@@ -326,34 +326,6 @@ class ForcePIDcontroller():
         self.error = 0
         self.pre_error = 0
 
-class LQcontroller():
-    '''
-        Linear Quadratic Controller for angle control only
-    '''
-    def __init__(self):
-        self.A = matrix("0 1; 122.625 0")
-        self.B = matrix("0; 12.5")
-        self.Q = matrix("1 0; 0 .1")
-        self.R = matrix("1")
-
-        self.K,self.S,self.E = lqr(self.A,self.B,self.Q,self.R)
-        print(self.K)
-
-        self.action = 0
-
-    def control(self,sim):
-        # Build state vector
-        x = array([sim.phi,sim.phi_dot])
-        self.action = - self.K[0][0] * x[0] - self.K[0][1] * x[1]
-        #print(self.action)
-        return self.action 
-
-    def applyCommand(self,sim):
-        sim.acc += self.action
-
-    def reset(self):
-        self.action = 0
-
 class AnglePositionPIDcontroller():
     '''
         Control phi and p as well
