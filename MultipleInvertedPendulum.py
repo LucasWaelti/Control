@@ -176,11 +176,11 @@ class CartPendulumPhysics():
             self.apply_force_command()
 
         # Compute new accelerations 
-        # (make sure to consider values of the same time interval!!)
         if(self.controlled_entity == "a"):
             self.apply_acceleration_command()
             self.phi_ddot = self.calculate_phi_ddot()
         else:
+            # (make sure to consider values of the same time interval!!)
             phi_ddot_new = self.calculate_phi_ddot()
             self.acc = self.calculate_acc()
             self.phi_ddot = phi_ddot_new
