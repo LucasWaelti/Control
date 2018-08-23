@@ -332,24 +332,26 @@ class AnglePositionPIDcontroller():
     '''
     def __init__(self):
         self.phiPID = PIDcontroller()
-        self.phiPID.set_PID(p=149.81,i=800,d=7) 
+        self.phiPID.set_PID(p=219.81,i=1000,d=12) #p=149.81,i=800,d=7
         self.supPID = PIDcontroller()
-        self.supPID.set_PID(p=-2,i=0,d=-0.08) # p=-2,i=0,d=-0.08 works good
+        a = 100
+        b = 10
+        c = 1
+        self.supPID.set_PID(p=a*b+a*c+b*c,i=a*b*c,d=a+b+c) # p=-2,i=0,d=-0.08 works good
         self.supPID.select_variable("p")
         self.supPID.set_target(0)
-        self.K = 1 # Feedback gain coefficient
+        self.K = 1 # Conversion gain coefficient (positive acc needs negative angle)
         self.action = 0
 
     def control(self,sim):
-        sim.p *= self.K 
         target = self.supPID.control(sim)
-        sim.p /= self.K
+        target *= self.K
 
-        lim = 0.3
+        '''lim = 0.3
         if(target > lim):
             target = lim
         elif(target < -lim):
-            target = -lim
+            target = -lim'''
         self.phiPID.target = target
         self.action = self.phiPID.control(sim)
         return self.action
@@ -498,8 +500,8 @@ class Pendulum():
             # Update physics first
             self.sim.update_command(0)
             self.sim.update_physics()
-            self.sim.acc = 0
-            self.sim.v = 0
+            #self.sim.acc = 0
+            #self.sim.v = 0
 
         # Update graphics
         self.graphics.update_display(self.sim)
@@ -508,6 +510,7 @@ class Pendulum():
         if(self.sim.out_of_range or self.sim.fallen):
             self.failed = True
             self.is_done = True
+            self.sim.v = 0
         elif(math.fabs(self.sim.phi) < 0.01):
                 self.timer += 1
 
