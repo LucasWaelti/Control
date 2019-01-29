@@ -17,8 +17,8 @@ class Matrix{
     void buildMatrix(std::string name);
     void buildMatrix(std::string name,unsigned int rows,unsigned int cols,const double* values);
     void getDim(int* dim);
-    double get(int row, int col);                  // Starts at 1, not 0!
-    void setValue(int row, int col, double value); // Starts at 1, not 0!
+    double get(int row, int col);
+    void setValue(int row, int col, double value);
     void eye(unsigned int rows, unsigned int cols);
     void zeros(unsigned int rows, unsigned int cols);
     void displayMatrix();

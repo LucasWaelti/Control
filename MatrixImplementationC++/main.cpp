@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "matrix.hpp"
+#include "lqr.hpp"
 
 int main()
 {
@@ -64,5 +65,33 @@ int main()
     Matrix x = A.inv()*v;
     x.setName("x");
     x.displayMatrix();
+
+
+
+    // Implement a LQR controller
+    Matrix Phi;
+    const double phi[4] = {2,1,-5,4};
+    Phi.buildMatrix("Phi",2,2,phi);
+
+    Matrix Gamma;
+    const double gamma[2] = {0,1};
+    Gamma.buildMatrix("Gamma",2,1,gamma);
+
+    //Matrix C;
+    const double c[4] = {1,0,0,0};
+    C.buildMatrix("C",2,2,c);
+
+    Matrix Q1;
+    const double q1[4] = {1,0,0,1};
+    Q1.buildMatrix("Q1",2,2,q1);
+
+    Matrix Q2;
+    const double q2[1] = {1};
+    Q2.buildMatrix("Q2",1,1,q2);
+
+    Matrix K = LQR::lqr(Phi,Gamma,Q1,Q2);
+    K.setName("K");
+    K.displayMatrix();
+
     return 0;
 }

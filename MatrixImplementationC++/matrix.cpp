@@ -50,11 +50,11 @@ void Matrix::getDim(int* dim){
 }
 
 double Matrix::get(int row, int col){
-    return this->M[row-1][col-1];
+    return this->M[row][col];
 }
 
 void Matrix::setValue(int row, int col, double value){
-    this->M[row-1][col-1] = value;
+    this->M[row][col] = value;
 }
 
 void Matrix::eye(unsigned int rows, unsigned int cols){
@@ -108,6 +108,13 @@ Matrix Matrix::inv(){
     result.name = this->name + "inv";
     result.num_cols = this->num_cols;
     result.num_rows = this->num_rows;
+
+    // Scalar case
+    if(result.num_cols == 1){
+        result.zeros(1,1);
+        result.M[0][0] = 1/this->M[0][0];
+        return result;
+    }
 
     // Copy content of vector into a temporary one
     std::vector< std::vector<double> > m = this->M;
