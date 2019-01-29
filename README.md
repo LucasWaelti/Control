@@ -4,7 +4,7 @@ This repository is about Control Theory and aims at making experimentation simpl
 # Matrix Implementation in C++
 The class Matrix (`Matrix.cpp/hpp`) enables the user to work with matrices by making available tools such as matrix inversion, transpose, matrices addition and multiplication. The class uses the `std::vector` class. 
 
-# Multiple Pendulum Simulation
+# Multiple Pendulum Simulation in Python
 The file [MultipleInvertedPendulum.py](https://github.com/LucasWaelti/Control/blob/master/MultipleInvertedPendulum.py) contains the simulation of three pendulums with identical physical characteristics but with different controllers. 
 
 - Orange: a PID controls the acceleration of the cart. The closed loop has 3 poles located in -100, -10 and -10. The controller is very stable and relatively efficient. 
