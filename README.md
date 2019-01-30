@@ -2,9 +2,9 @@
 This repository is about Control Theory and aims at making experimentation simple with classical control problems such as the inverted pendulum. 
 
 # Matrix and LQR Implementation in C++
-The class Matrix ([`Matrix.cpp/hpp`](https://github.com/LucasWaelti/Control/blob/master/MatrixImplementationC%2B%2B/matrix.cpp)) enables the user to work with matrices by making available tools such as matrix inversion, transpose, concatenation, matrices addition, subtraction and multiplication, rank computation. The class is internally based on the `std::vector` class. 
+The class Matrix ([`Matrix.cpp/hpp`](https://github.com/LucasWaelti/Control/blob/master/MatrixImplementationC%2B%2B/matrix.cpp)) enables the user to work with matrices by making available tools such as matrix inversion, transpose, concatenation, matrices addition, subtraction and multiplication and rank computation. The class is internally based on the `std::vector` class. 
 
-The LQR functions ([`lqr.cpp/hpp`](https://github.com/LucasWaelti/Control/blob/master/MatrixImplementationC%2B%2B/lqr.cpp)) allow to compute the feedback gain for a controller and an observer. They rely on the Matrix class to run the computations. You can make use of these functions as follows:
+The LQR functions ([`lqr.cpp/hpp`](https://github.com/LucasWaelti/Control/blob/master/MatrixImplementationC%2B%2B/lqr.cpp)) allow to compute the feedback gain for a discrete controller and an observer. They rely on the Matrix class to run the computations. You can make use of these functions as follows:
 ```C++
 // Gain K for a state feedback controller
 Matrix K = LQR::lqr(Phi,Gamma,Q1,Q2);
@@ -15,7 +15,7 @@ Matrix L = LQR::lqr_observer(Phi,C,Q1,Q2);
 Matrix Ltrans = LQR::lqr(Phi.trans(),C.trans(),Q1,Q2);
 Matrix L = Ltrans.trans();
 ```
-Methods to compute the controllability and observability of a discrete system are also available:
+Methods to compute the controllability and observability matrices of a discrete system are also available:
 ```C++
 Matrix G = LQR::controllability(Phi,Gamma);
 Matrix Q = LQR::observability(Phi,C);
