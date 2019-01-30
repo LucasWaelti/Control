@@ -11,14 +11,24 @@ int main()
     Matrix A;
     double values[9] = {1,2,2,
                         3,1,1,
-                        2,2,1};
+                        4,3,5};
     A.buildMatrix("A",3,3,values);
     A.displayMatrix();
+    std::cout << "Rank(A) = " << A.Rank() << std::endl;
 
     // Store its inverse
     Matrix B = A.inv();
     B.setName("B");
     B.displayMatrix();
+
+    Matrix AB = A.concatRows(B);
+    AB.setName("AB");
+    AB.displayMatrix();
+
+    Matrix Ab = A.concatCols(B);
+    Ab.setName("Ab");
+    Ab.displayMatrix();
+    std::cout << "Rank(Ab) = " << Ab.Rank() << std::endl;
 
     // Add the two precedent matrices
     Matrix C = A + B;
@@ -53,6 +63,17 @@ int main()
     // Get a single value from G
     std::cout << "Value of G at 2,1: " << G.get(2,1) << std::endl;
 
+    // Power of a matrix
+    Matrix H;
+    H.eye(3,3);
+    H = H*2;
+    H = H^3;
+    H.setName("H^3");
+    H.displayMatrix();
+
+
+
+
     // Create a vector
     Matrix v;
     double v_values[3] = {1,
@@ -65,6 +86,8 @@ int main()
     Matrix x = A.inv()*v;
     x.setName("x");
     x.displayMatrix();
+
+
 
 
 
@@ -89,6 +112,12 @@ int main()
     double q2[1] = {1};
     Q2.buildMatrix("Q2",1,1,q2);
 
+    // Compute controllability matrix
+    G = LQR::controllability(Phi,Gamma);
+    G.displayMatrix();
+    std::cout << "Rank of controllability matrix G: " << G.Rank() << std::endl;
+
+    // Compute feedback gain
     Matrix K = LQR::lqr(Phi,Gamma,Q1,Q2);
     K.setName("K");
     K.displayMatrix();

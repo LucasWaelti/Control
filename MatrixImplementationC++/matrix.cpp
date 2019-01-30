@@ -96,6 +96,46 @@ void Matrix::displayMatrix(){
     }
 }
 
+int Matrix::Rank(){
+    int Rank = this->num_rows<this->num_cols?this->num_rows:this->num_cols;
+    Matrix M = *this;
+
+    for(unsigned int i=0; i<this->num_rows; i++){
+        // Get pivot of row i
+        double pivot = M.M[i][i];
+        if(pivot == 0)
+            // Find a row with non zero element in column i
+            for(unsigned int r=i+1;r<num_rows;r++)
+                if(M.M[r][i] != 0){
+                    for(unsigned int c=0;c<num_cols;c++){
+                        M.M[i][c] += M.M[r][c];
+                    }
+                    pivot = M.M[i][i];
+                    break;
+                }
+        if(pivot == 0){
+            Rank--;
+            continue;
+        }
+        // Divide the row by the pivot (M and Minv)
+        for(unsigned int j=0; j<this->num_cols; j++){
+            M.M[i][j] /= pivot;
+        }
+        // Cancel the value of the following rows
+        double val = 0;
+        for(unsigned int r=i+1;r<num_rows;r++){
+            val = M.M[r][i];
+            if(val == 0)
+                continue;
+            for(unsigned int c=0;c<num_cols;c++){
+                M.M[r][c] -= M.M[i][c]*val;
+            }
+        }
+    }
+
+    return Rank;
+}
+
 Matrix Matrix::inv(){
 
     Matrix result;
@@ -204,6 +244,43 @@ Matrix Matrix::trans(){
     return result;
 }
 
+Matrix Matrix::concatRows(Matrix R){
+    Matrix result;
+
+    if(this->num_rows != R.num_rows){
+        std::cout << "Error in Matrix::concatRows: number of rows must match.\n";
+        return result;
+    }
+
+    result = *this;
+    for(unsigned int i=0; i<this->num_rows; i++){
+        for(unsigned int j=0; j<R.num_cols; j++){
+            result.M[i].push_back(R.M[i][j]);
+        }
+    }
+
+    result.num_rows = this->num_rows;
+    result.num_cols = this->num_cols + R.num_cols;
+    return result;
+}
+
+Matrix Matrix::concatCols(Matrix C){
+    Matrix result;
+
+    if(this->num_cols != C.num_cols){
+        std::cout << "Error in Matrix::concatCols: number of columns must match.\n";
+        return result;
+    }
+
+    result = *this;
+    for(unsigned int i=0; i<C.num_rows; i++)
+        result.M.push_back(C.M[i]);
+
+    result.num_rows = this->num_rows + C.num_rows;
+    result.num_cols = this->num_cols;
+    return result;
+}
+
 Matrix Matrix::operator+(const Matrix& m){
 
     Matrix result;
@@ -294,6 +371,21 @@ Matrix Matrix::operator/(const double& d){
         for(unsigned int j=0; j<this->num_cols; j++){
                 result.M[i][j] = this->M[i][j]/d;
         }
+    }
+    return result;
+}
+
+Matrix Matrix::operator^(const int& p){
+    Matrix result;
+
+    if(this->num_cols != this->num_rows){
+        std::cout << "Error: Matrix must be squared to apply power.\n";
+        return result;
+    }
+
+    result = *this;
+    for(int i=2; i<=p; i++){
+        result = result*(*this);
     }
     return result;
 }

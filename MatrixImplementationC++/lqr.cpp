@@ -1,9 +1,5 @@
 #include "lqr.hpp"
 
-void LQR::setThreshold(double thres){
-    LQR::threshold = thres;
-}
-
 bool LQR::evaluate_convergence(Matrix S, Matrix S_old){
     Matrix diff = S - S_old;
     int dim[2];
@@ -21,21 +17,26 @@ bool LQR::evaluate_convergence(Matrix S, Matrix S_old){
         }
     }
 
-    if(max_variation < 0.001)
+    if(max_variation < THRESHOLD)
         return true;
     else
         return false;
+}
+
+Matrix LQR::controllability(Matrix Phi, Matrix Gamma){
+    int p = Phi.num_rows-1;
+    Matrix G = Gamma;
+    for(int i=1; i<=p; i++){
+        G = G.concatRows((Phi^p)*Gamma);
+    }
+    G.setName("G");
+    return G;
 }
 
 Matrix LQR::lqr(Matrix Phi, Matrix Gamma, Matrix Q1, Matrix Q2){
     // Compute the LQR gain for a state feedback controller
     // Q1 penalizes the state x(k), n x n
     // Q2 penalizes the input u(k)
-
-    if(!(LQR::threshold > 0)){
-        std::cout << "Warning, in LQR::lqr(): using default threshold.\n";
-        LQR::threshold = 0.001;
-    }
 
     Matrix S = Q1;
     Matrix S_old = Q1*10;
@@ -55,15 +56,20 @@ Matrix LQR::lqr(Matrix Phi, Matrix Gamma, Matrix Q1, Matrix Q2){
     return K;
 }
 
+Matrix LQR::observability(Matrix Phi, Matrix C){
+    int p = Phi.num_rows-1;
+    Matrix Q = C;
+    for(int i=1; i<=p; i++){
+        Q = Q.concatCols(C*(Phi^p));
+    }
+    Q.setName("Q");
+    return Q;
+}
+
 Matrix LQR::lqr_observer(Matrix Phi, Matrix C, Matrix Q1, Matrix Q2){
     // Compute the LQR gain for an observer
     // Q1 penalizes the modelling error delta(k), n x n
     // Q2 penalizes the measurement noise y(k)
-
-    if(!(LQR::threshold > 0)){
-        std::cout << "Warning, in LQR::lqr(): using default threshold.\n";
-        LQR::threshold = 0.001;
-    }
 
     Matrix S = Q1;
     Matrix S_old = Q1*10;
