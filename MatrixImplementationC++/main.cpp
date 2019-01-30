@@ -9,9 +9,9 @@ int main()
 
     // Build a matrix by hand
     Matrix A;
-    const double values[9] = {1,2,2,
-                              3,1,1,
-                              2,2,1};
+    double values[9] = {1,2,2,
+                        3,1,1,
+                        2,2,1};
     A.buildMatrix("A",3,3,values);
     A.displayMatrix();
 
@@ -55,7 +55,7 @@ int main()
 
     // Create a vector
     Matrix v;
-    const double v_values[3] = {1,
+    double v_values[3] = {1,
                                 2,
                                 3};
     v.buildMatrix("v",3,1,v_values);
@@ -70,23 +70,23 @@ int main()
 
     // Implement a LQR controller
     Matrix Phi;
-    const double phi[4] = {2,1,-5,4};
+    double phi[4] = {2,1,-5,4};
     Phi.buildMatrix("Phi",2,2,phi);
 
     Matrix Gamma;
-    const double gamma[2] = {0,1};
+    double gamma[2] = {0,1};
     Gamma.buildMatrix("Gamma",2,1,gamma);
 
     //Matrix C;
-    const double c[4] = {1,0,0,0};
+    double c[4] = {1,0,0,0};
     C.buildMatrix("C",2,2,c);
 
     Matrix Q1;
-    const double q1[4] = {1,0,0,1};
+    double q1[4] = {1,0,0,1};
     Q1.buildMatrix("Q1",2,2,q1);
 
     Matrix Q2;
-    const double q2[1] = {1};
+    double q2[1] = {1};
     Q2.buildMatrix("Q2",1,1,q2);
 
     Matrix K = LQR::lqr(Phi,Gamma,Q1,Q2);
