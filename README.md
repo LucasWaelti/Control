@@ -1,7 +1,7 @@
 # Control Theory 
 This repository is about Control Theory and aims at making experimentation simple with classical control problems such as the inverted pendulum. 
 
-# Matrix Implementation in C++
+# Matrix and LQR Implementation in C++
 The class Matrix ([`Matrix.cpp/hpp`](https://github.com/LucasWaelti/Control/blob/master/MatrixImplementationC%2B%2B/matrix.cpp)) enables the user to work with matrices by making available tools such as matrix inversion, transpose, matrices addition and multiplication. The class is internally based on the `std::vector` class. 
 
 The LQR functions ([`lqr.cpp/hpp`](https://github.com/LucasWaelti/Control/blob/master/MatrixImplementationC%2B%2B/lqr.cpp)) allow to compute the feedback gain for a controller and an observer. They rely on the Matrix class to run the computations. You can make use of these functions as follows:
