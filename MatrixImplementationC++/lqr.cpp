@@ -27,7 +27,7 @@ Matrix LQR::controllability(Matrix Phi, Matrix Gamma){
     int p = Phi.num_rows-1;
     Matrix G = Gamma;
     for(int i=1; i<=p; i++){
-        G = G.concatRows((Phi^p)*Gamma);
+        G = G.concatRows((Phi^i)*Gamma);
     }
     G.setName("G");
     return G;
@@ -60,7 +60,7 @@ Matrix LQR::observability(Matrix Phi, Matrix C){
     int p = Phi.num_rows-1;
     Matrix Q = C;
     for(int i=1; i<=p; i++){
-        Q = Q.concatCols(C*(Phi^p));
+        Q = Q.concatCols(C*(Phi^i));
     }
     Q.setName("Q");
     return Q;
